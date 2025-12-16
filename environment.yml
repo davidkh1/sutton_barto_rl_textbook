@@ -1,8 +1,14 @@
 name: rl_textbook
+# If you make changes, run:
+# conda env update -n rl_textbook -f environment.yml --prune
+#
+# Inspect installed packages in that env
+# python -m pip show <package_name>
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.13
-  - numpy
   - matplotlib
+  - numpy
+  - pypdf
+  - python=3.13

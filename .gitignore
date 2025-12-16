@@ -21,3 +21,7 @@ build/
 
 # Output
 chapter*/output/
+
+# Local book PDFs (downloaded/generated)
+textbook_chapters/RLbook*.pdf
+chapter*/**/ch[0-9][0-9]_*.pdf
