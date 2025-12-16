@@ -1,24 +1,3 @@
-# Python
-__pycache__/
-*.py[cod]
-*.so
-.Python
-*.egg-info/
-dist/
-build/
-
-# IDE
-.idea/
-*.swp
-*.swo
-.vscode/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# OS
-.DS_Store
-
 # Output
 chapter*/output/
 
