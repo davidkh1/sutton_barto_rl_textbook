@@ -1,11 +1,15 @@
 """
-Check what is the best reward per step on the N-armed Testbed.
-For 10-armed Testbed: 1.538...->1.54
+Estimate the best expected reward per step on the 10-armed Testbed (Section 2.3).
+This is the upper bound in Figure 2.2: if an agent knew the true q*(a) values
+and always picked the best arm, its average reward would converge to E[max_a q*(a)].
+For 10 arms with q*(a) ~ N(0,1), that value is ≈ 1.5388 (rounded to 1.54).
 """
 import numpy as np
+
+rng = np.random.default_rng(seed=42)
 num_arms = 10  # as in the book
-num_random_bandit_problems = 2_000_000
-testbed = np.random.randn(num_random_bandit_problems, num_arms)
-best_reward_per_problem = testbed.max(axis=1)  # size of num_random_bandit_problems
-reward_per_testbed = best_reward_per_problem.mean()
-print(reward_per_testbed)
+num_problems = 2_000_000
+testbed = rng.standard_normal((num_problems, num_arms))
+best_reward_per_problem = testbed.max(axis=1)
+best_reward_per_step = best_reward_per_problem.mean()
+print(f"Best expected reward per step (10-armed): {best_reward_per_step:.4f}")
