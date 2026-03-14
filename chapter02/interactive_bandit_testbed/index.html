@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Multi-Armed Bandit Testbed — Sutton &amp; Barto Ch.2</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
@@ -133,6 +135,10 @@
         <h3>Final Average Reward Comparison</h3>
         <canvas id="chartBar"></canvas>
       </div>
+    </div>
+    <div style="text-align:center; margin-top:8px;">
+      <button class="btn btn-secondary" style="flex:none; display:inline-block; padding:6px 16px; font-size:12px;" onclick="resetZoom()">Reset Zoom</button>
+      <span style="font-size:11px; color:#999; margin-left:8px;">Scroll to zoom &middot; Drag to pan &middot; Shift+drag to select region &middot; Double-click to reset</span>
     </div>
     <div class="reference">
       Based on <a href="http://incompleteideas.net/book/the-book-2nd.html" target="_blank">
@@ -417,14 +423,19 @@ async function runSimulation() {
     };
   }
 
-  /* Compute best possible average reward = mean of max q*(a) across runs */
+  /* Compute best possible reward = E[max of k N(0,1)]
+     Use 100k Monte Carlo samples for a stable estimate (~1.54 for k=10) */
+  const bestRng = mulberry32(99999);
   let sumBest = 0;
-  for (let r = 0; r < nRuns; r++) {
+  for (let r = 0; r < 100000; r++) {
     let best = -Infinity;
-    for (let a = 0; a < nArms; a++) if (qStar[r][a] > best) best = qStar[r][a];
+    for (let a = 0; a < nArms; a++) {
+      const v = normalRandom(bestRng, 0, 1);
+      if (v > best) best = v;
+    }
     sumBest += best;
   }
-  bestPossibleReward = sumBest / nRuns;
+  bestPossibleReward = sumBest / 100000;
 
   prog.style.width = '100%';
   runBtn.disabled = false;
@@ -440,12 +451,23 @@ let chartReward, chartOptimal, chartCumulative, chartBar;
 let bestPossibleReward = null;
 
 function initCharts() {
+  const zoomOpts = {
+    zoom: {
+      wheel: { enabled: true },
+      pinch: { enabled: true },
+      drag: { enabled: true, modifierKey: 'shift' },
+      mode: 'xy',
+    },
+    pan: { enabled: true, mode: 'xy' },
+    limits: { x: { minRange: 10 }, y: { minRange: 0.1 } },
+  };
   const lineOpts = {
     responsive: true,
     animation: false,
     plugins: {
       legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 12, font: { size: 11 } } },
       tooltip: { mode: 'index', intersect: false },
+      zoom: zoomOpts,
     },
     interaction: { mode: 'index', intersect: false },
     elements: { point: { radius: 0 }, line: { borderWidth: 2 } },
@@ -519,6 +541,18 @@ function updateCharts() {
   chartBar.update();
 }
 
+function resetZoom() {
+  [chartReward, chartOptimal, chartCumulative].forEach(c => c.resetZoom());
+}
+
+/* Double-click to reset zoom on individual charts */
+['chartReward','chartOptimal','chartCumulative'].forEach(id => {
+  document.getElementById(id).addEventListener('dblclick', function() {
+    const chart = Chart.getChart(this);
+    if (chart) chart.resetZoom();
+  });
+});
+
 /* ═══════════════════════════════════════
    Initialise with default agents
    ═══════════════════════════════════════ */
@@ -531,6 +565,9 @@ addAgent('optimistic');
 addAgent('ucb');
 
 renderAgents();
+
+/* Auto-run simulation on page load */
+runSimulation();
 </script>
 </body>
 </html>
