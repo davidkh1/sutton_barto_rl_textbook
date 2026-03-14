@@ -2,6 +2,10 @@
 
 Studying [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/the-book-2nd.html) by Sutton & Barto (2nd edition).
 
+## Interactive Demos
+
+- [**Multi-Armed Bandit Testbed**](https://davidkh1.github.io/deeprl_educational/sutton_barto_rl_textbook/chapter02/interactive_bandit_testbed/) (Chapter 2) — compare Greedy, ε-Greedy, Optimistic, UCB, and Gradient Bandit methods
+
 ## Setup
 
 ```bash
