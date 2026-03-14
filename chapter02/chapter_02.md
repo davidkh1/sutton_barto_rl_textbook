@@ -10,3 +10,7 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 - Figure 2.2: [code](figure_2_2.py) and [graph](results/figure_2_2.png)
 - Best possible reward per step is ~1.54: [Monte Carlo estimate](best_reward_per_step.py) and
   [analytical derivation](best_reward_per_step_derivation.ipynb)
+
+## Interactive Simulation
+
+- [**Interactive Bandit Testbed**](https://davidkh1.github.io/deeprl_educational/sutton_barto_rl_textbook/chapter02/interactive_bandit_testbed/) — browser-based simulation comparing Greedy, ε-Greedy, Optimistic, UCB, and Gradient Bandit methods ([source](interactive_bandit_testbed/index.html))
