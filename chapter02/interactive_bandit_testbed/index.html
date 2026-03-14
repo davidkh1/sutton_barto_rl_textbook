@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Armed Bandit Testbed — Sutton &amp; Barto Ch.2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+
+  .header { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 16px 24px; }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header p { font-size: 13px; color: #666; margin-top: 2px; }
+
+  .layout { display: flex; min-height: calc(100vh - 70px); }
+
+  /* ── Sidebar ── */
+  .sidebar { width: 320px; min-width: 320px; background: #fff; border-right: 1px solid #e0e0e0; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 8px; border-left: 3px solid #4a7cff; padding-left: 8px; }
+
+  .env-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .env-field { flex: 1; }
+  .env-field label { display: block; font-size: 11px; font-weight: 600; color: #666; margin-bottom: 4px; text-transform: uppercase; }
+  .env-field input { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+
+  /* ── Agent cards ── */
+  .agent-card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #ccc; }
+  .agent-header { display: flex; justify-content: space-between; align-items: center; }
+  .agent-name { font-weight: 700; font-size: 14px; }
+  .agent-params { display: flex; gap: 8px; margin-top: 6px; align-items: end; }
+  .agent-params label { font-size: 11px; color: #666; text-transform: uppercase; }
+  .agent-params input, .agent-params select { width: 64px; padding: 3px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+  .remove-btn { background: none; border: none; color: #999; cursor: pointer; font-size: 16px; padding: 2px 6px; }
+  .remove-btn:hover { color: #e44; }
+
+  .agent-stats { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: #666; }
+  .stat-label { text-transform: uppercase; font-weight: 600; }
+  .stat-value { font-weight: 700; color: #333; font-size: 13px; }
+
+  .add-row { display: flex; gap: 8px; margin-top: 8px; margin-bottom: 16px; }
+  .add-row select { flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+  .add-btn { padding: 6px 12px; background: #4a7cff; color: #fff; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: auto; padding-top: 16px; }
+  .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; }
+  .btn-primary { background: #4a7cff; color: #fff; }
+  .btn-primary:hover { background: #3a6ae8; }
+  .btn-primary:disabled { background: #a0b8f0; cursor: not-allowed; }
+  .btn-secondary { background: #f0f0f0; color: #666; }
+  .btn-secondary:hover { background: #e0e0e0; }
+
+  /* ── Main area ── */
+  .main { flex: 1; padding: 16px; overflow-y: auto; }
+  .progress-bar { height: 3px; background: #e0e0e0; border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #4a7cff; transition: width 0.1s; width: 0%; }
+
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chart-card { background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #e0e0e0; }
+  .chart-card h3 { font-size: 14px; text-align: center; margin-bottom: 8px; color: #444; }
+
+  .reference { font-size: 11px; color: #999; text-align: center; margin-top: 12px; }
+  .reference a { color: #4a7cff; text-decoration: none; }
+
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid #e0e0e0; }
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Multi-Armed Bandit Testbed</h1>
+  <p>Interactive simulation &mdash; Sutton &amp; Barto, Sections 2.3&ndash;2.8</p>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="section-label">Environment</div>
+    <div class="env-row">
+      <div class="env-field">
+        <label>Arms (k)</label>
+        <input type="number" id="nArms" value="10" min="2" max="50">
+      </div>
+      <div class="env-field">
+        <label>Steps</label>
+        <input type="number" id="nSteps" value="1000" min="10" max="10000">
+      </div>
+      <div class="env-field">
+        <label>Runs</label>
+        <input type="number" id="nRuns" value="1000" min="10" max="5000">
+      </div>
+    </div>
+
+    <div class="section-label">Agents &amp; Results</div>
+    <div id="agentList"></div>
+
+    <div class="add-row">
+      <select id="agentType">
+        <option value="greedy">Greedy</option>
+        <option value="epsilon" selected>Epsilon-Greedy</option>
+        <option value="optimistic">Optimistic Initial Values</option>
+        <option value="ucb">UCB</option>
+        <option value="gradient">Gradient Bandit</option>
+      </select>
+      <button class="add-btn" onclick="addAgent()" title="Add agent">+</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+      <button class="btn btn-primary" id="runBtn" onclick="runSimulation()">Run Simulation</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Average Reward Over Time</h3>
+        <canvas id="chartReward"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>% Optimal Action Over Time</h3>
+        <canvas id="chartOptimal"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Cumulative Average Reward</h3>
+        <canvas id="chartCumulative"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Final Average Reward Comparison</h3>
+        <canvas id="chartBar"></canvas>
+      </div>
+    </div>
+    <div class="reference">
+      Based on <a href="http://incompleteideas.net/book/the-book-2nd.html" target="_blank">
+      Reinforcement Learning: An Introduction</a> (2nd ed.) by Sutton &amp; Barto
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   Seeded PRNG — mulberry32 (fast 32-bit generator)
+   ═══════════════════════════════════════════════════ */
+function mulberry32(seed) {
+  let s = seed | 0;
+  return function () {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* Box-Muller for N(mean, std) */
+function normalRandom(rng, mean, std) {
+  let u1 = rng(), u2 = rng();
+  while (u1 === 0) u1 = rng();
+  return mean + std * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+/* ═══════════════════════════════════════
+   Color palette
+   ═══════════════════════════════════════ */
+const COLORS = [
+  '#4a7cff','#e44444','#2eaa4a','#ee8822','#8844cc',
+  '#22bbcc','#cc4488','#88aa22','#666666','#ddaa00'
+];
+let colorIdx = 0;
+function nextColor() { return COLORS[colorIdx++ % COLORS.length]; }
+
+/* ═══════════════════════════════════════
+   Agent management
+   ═══════════════════════════════════════ */
+let agents = [];
+let agentId = 0;
+
+function addAgent(type) {
+  type = type || document.getElementById('agentType').value;
+  const color = nextColor();
+  const a = { id: agentId++, type, color, results: null, params: {} };
+
+  switch (type) {
+    case 'greedy':    a.name = 'Greedy'; break;
+    case 'epsilon':   a.name = 'Epsilon-Greedy'; a.params = { epsilon: 0.1 }; break;
+    case 'optimistic':a.name = 'Optimistic';     a.params = { q0: 5, epsilon: 0 }; break;
+    case 'ucb':       a.name = 'UCB';            a.params = { c: 2 }; break;
+    case 'gradient':  a.name = 'Gradient';       a.params = { alpha: 0.1, baseline: true }; break;
+  }
+  agents.push(a);
+  renderAgents();
+  return a;
+}
+
+function removeAgent(id) {
+  agents = agents.filter(a => a.id !== id);
+  renderAgents();
+  updateCharts();
+}
+
+function clearAll() {
+  agents = []; colorIdx = 0; agentId = 0;
+  renderAgents(); updateCharts();
+}
+
+function agentLabel(a) {
+  switch (a.type) {
+    case 'greedy':    return 'Greedy';
+    case 'epsilon':   return '\u03B5 = ' + a.params.epsilon;
+    case 'optimistic':return 'Optimistic (Q\u2080=' + a.params.q0 + ')';
+    case 'ucb':       return 'UCB (c=' + a.params.c + ')';
+    case 'gradient':  return 'Gradient (\u03B1=' + a.params.alpha + ')';
+  }
+  return a.name;
+}
+
+function paramInput(agentId, key, val, step, min, max) {
+  return '<div><label>' + key + '</label><br>' +
+    '<input type="number" step="' + step + '" min="' + min + '" max="' + (max||'') + '" value="' + val + '" ' +
+    'onchange="agents.find(a=>a.id===' + agentId + ').params.' + key + '=+this.value"></div>';
+}
+
+function renderAgents() {
+  const list = document.getElementById('agentList');
+  list.innerHTML = '';
+  for (const a of agents) {
+    const card = document.createElement('div');
+    card.className = 'agent-card';
+    card.style.borderLeftColor = a.color;
+
+    let params = '';
+    if (a.type === 'epsilon')
+      params = '<div class="agent-params">' + paramInput(a.id,'epsilon',a.params.epsilon,0.01,0,1) + '</div>';
+    else if (a.type === 'optimistic')
+      params = '<div class="agent-params">' + paramInput(a.id,'q0',a.params.q0,1,-10,'') + paramInput(a.id,'epsilon',a.params.epsilon,0.01,0,1) + '</div>';
+    else if (a.type === 'ucb')
+      params = '<div class="agent-params">' + paramInput(a.id,'c',a.params.c,0.1,0,'') + '</div>';
+    else if (a.type === 'gradient')
+      params = '<div class="agent-params">' + paramInput(a.id,'alpha',a.params.alpha,0.01,0,'') +
+        '<div><label>Baseline</label><br><select style="width:64px" onchange="agents.find(a=>a.id===' + a.id + ').params.baseline=this.value===\'true\'">' +
+        '<option value="true"' + (a.params.baseline?' selected':'') + '>Yes</option>' +
+        '<option value="false"' + (!a.params.baseline?' selected':'') + '>No</option></select></div></div>';
+
+    let stats = '';
+    if (a.results) {
+      const r = a.results;
+      stats = '<div class="agent-stats">' +
+        '<div><span class="stat-label">Reward</span><br><span class="stat-value">' + r.finalReward.toFixed(3) + '</span></div>' +
+        '<div><span class="stat-label">Optimal %</span><br><span class="stat-value">' + r.finalOptimal.toFixed(1) + '%</span></div>' +
+        '<div><span class="stat-label">Cum. Avg</span><br><span class="stat-value">' + r.cumAvg.toFixed(3) + '</span></div></div>';
+    }
+
+    card.innerHTML =
+      '<div class="agent-header"><span class="agent-name" style="color:' + a.color + '">' + agentLabel(a) + '</span>' +
+      '<button class="remove-btn" onclick="removeAgent(' + a.id + ')">\u2715</button></div>' +
+      params + stats;
+    list.appendChild(card);
+  }
+}
+
+/* ═══════════════════════════════════════
+   Bandit simulation engine
+   ═══════════════════════════════════════ */
+function greedyAction(Q, nArms, rng) {
+  let maxQ = -Infinity, count = 0;
+  for (let a = 0; a < nArms; a++) {
+    if (Q[a] > maxQ) { maxQ = Q[a]; count = 1; }
+    else if (Q[a] === maxQ) count++;
+  }
+  let pick = Math.floor(rng() * count);
+  for (let a = 0; a < nArms; a++) {
+    if (Q[a] === maxQ) { if (pick === 0) return a; pick--; }
+  }
+  return 0;
+}
+
+function softmaxProbs(H, nArms) {
+  const probs = new Float64Array(nArms);
+  let maxH = -Infinity;
+  for (let a = 0; a < nArms; a++) if (H[a] > maxH) maxH = H[a];
+  let sum = 0;
+  for (let a = 0; a < nArms; a++) { probs[a] = Math.exp(H[a] - maxH); sum += probs[a]; }
+  for (let a = 0; a < nArms; a++) probs[a] /= sum;
+  return probs;
+}
+
+function selectAction(agent, Q, counts, nArms, t, rng) {
+  if (agent.type === 'greedy') return greedyAction(Q, nArms, rng);
+
+  if (agent.type === 'epsilon' || agent.type === 'optimistic') {
+    const eps = agent.params.epsilon || 0;
+    if (rng() < eps) return Math.floor(rng() * nArms);
+    return greedyAction(Q, nArms, rng);
+  }
+
+  if (agent.type === 'ucb') {
+    for (let a = 0; a < nArms; a++) if (counts[a] === 0) return a;
+    let best = -Infinity, bestA = 0;
+    const logT = Math.log(t + 1);
+    for (let a = 0; a < nArms; a++) {
+      const v = Q[a] + agent.params.c * Math.sqrt(logT / counts[a]);
+      if (v > best) { best = v; bestA = a; }
+    }
+    return bestA;
+  }
+
+  if (agent.type === 'gradient') {
+    const probs = softmaxProbs(Q, nArms);
+    let r = rng(), cum = 0;
+    for (let a = 0; a < nArms; a++) { cum += probs[a]; if (r <= cum) return a; }
+    return nArms - 1;
+  }
+  return 0;
+}
+
+function updateQ(agent, Q, counts, action, reward, avgReward, nArms) {
+  if (agent.type === 'gradient') {
+    const alpha = agent.params.alpha;
+    const bl = agent.params.baseline ? avgReward : 0;
+    const probs = softmaxProbs(Q, nArms);
+    const diff = reward - bl;
+    for (let a = 0; a < nArms; a++) {
+      Q[a] += (a === action) ? alpha * diff * (1 - probs[a]) : -alpha * diff * probs[a];
+    }
+  } else {
+    counts[action]++;
+    Q[action] += (reward - Q[action]) / counts[action];
+  }
+}
+
+async function runSimulation() {
+  if (agents.length === 0) return;
+
+  const nArms  = +document.getElementById('nArms').value;
+  const nSteps = +document.getElementById('nSteps').value;
+  const nRuns  = +document.getElementById('nRuns').value;
+  const runBtn = document.getElementById('runBtn');
+  const prog   = document.getElementById('progressFill');
+
+  runBtn.disabled = true;
+  runBtn.textContent = 'Running\u2026';
+  prog.style.width = '0%';
+
+  /* Generate shared bandit problems */
+  const masterRng = mulberry32(42);
+  const qStar = [];          // [run][arm]
+  const optActions = [];      // [run]
+  for (let r = 0; r < nRuns; r++) {
+    const q = new Float64Array(nArms);
+    let bestA = 0, bestQ = -Infinity;
+    for (let a = 0; a < nArms; a++) {
+      q[a] = normalRandom(masterRng, 0, 1);
+      if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
+    }
+    qStar.push(q);
+    optActions.push(bestA);
+  }
+
+  const totalWork = agents.length * nRuns;
+  let workDone = 0;
+  const yieldEvery = Math.max(1, Math.floor(totalWork / 100));
+
+  for (const agent of agents) {
+    const sumRewards  = new Float64Array(nSteps);
+    const sumOptimal  = new Float64Array(nSteps);
+
+    /* Use a separate reward-noise seed per agent so each gets independent noise,
+       but the same bandit q* values are shared for fair comparison. */
+    const rewardRng = mulberry32(12345 + agent.id);
+
+    for (let run = 0; run < nRuns; run++) {
+      const Q      = new Float64Array(nArms);
+      const counts = new Float64Array(nArms);
+      if (agent.type === 'optimistic') Q.fill(agent.params.q0);
+
+      const optA = optActions[run];
+      let totalR = 0;
+
+      for (let t = 0; t < nSteps; t++) {
+        const action = selectAction(agent, Q, counts, nArms, t, rewardRng);
+        const reward = normalRandom(rewardRng, qStar[run][action], 1);
+        totalR += reward;
+        updateQ(agent, Q, counts, action, reward, totalR / (t + 1), nArms);
+        sumRewards[t] += reward;
+        if (action === optA) sumOptimal[t] += 1;
+      }
+
+      workDone++;
+      if (workDone % yieldEvery === 0) {
+        prog.style.width = (workDone / totalWork * 100) + '%';
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
+
+    /* Compute averages */
+    const avgR = new Float64Array(nSteps);
+    const avgO = new Float64Array(nSteps);
+    const cumR = new Float64Array(nSteps);
+    let cumSum = 0;
+    for (let t = 0; t < nSteps; t++) {
+      avgR[t] = sumRewards[t] / nRuns;
+      avgO[t] = (sumOptimal[t] / nRuns) * 100;
+      cumSum += avgR[t];
+      cumR[t] = cumSum / (t + 1);
+    }
+
+    agent.results = {
+      avgRewards:    Array.from(avgR),
+      avgOptimal:    Array.from(avgO),
+      cumAvgRewards: Array.from(cumR),
+      finalReward:   avgR[nSteps - 1],
+      finalOptimal:  avgO[nSteps - 1],
+      cumAvg:        cumR[nSteps - 1],
+    };
+  }
+
+  /* Compute best possible average reward = mean of max q*(a) across runs */
+  let sumBest = 0;
+  for (let r = 0; r < nRuns; r++) {
+    let best = -Infinity;
+    for (let a = 0; a < nArms; a++) if (qStar[r][a] > best) best = qStar[r][a];
+    sumBest += best;
+  }
+  bestPossibleReward = sumBest / nRuns;
+
+  prog.style.width = '100%';
+  runBtn.disabled = false;
+  runBtn.textContent = 'Run Simulation';
+  renderAgents();
+  updateCharts();
+}
+
+/* ═══════════════════════════════════════
+   Charts (Chart.js)
+   ═══════════════════════════════════════ */
+let chartReward, chartOptimal, chartCumulative, chartBar;
+let bestPossibleReward = null;
+
+function initCharts() {
+  const lineOpts = {
+    responsive: true,
+    animation: false,
+    plugins: {
+      legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 12, font: { size: 11 } } },
+      tooltip: { mode: 'index', intersect: false },
+    },
+    interaction: { mode: 'index', intersect: false },
+    elements: { point: { radius: 0 }, line: { borderWidth: 2 } },
+  };
+  const xAxis = { title: { display: true, text: 'Steps', font: { size: 12 } } };
+
+  chartReward = new Chart(document.getElementById('chartReward'), {
+    type: 'line', data: { labels: [], datasets: [] },
+    options: { ...lineOpts, scales: { x: xAxis, y: { title: { display: true, text: 'Average Reward' } } } },
+  });
+  chartOptimal = new Chart(document.getElementById('chartOptimal'), {
+    type: 'line', data: { labels: [], datasets: [] },
+    options: { ...lineOpts, scales: { x: xAxis, y: { title: { display: true, text: 'Optimal Action %' }, min: 0, max: 100 } } },
+  });
+  chartCumulative = new Chart(document.getElementById('chartCumulative'), {
+    type: 'line', data: { labels: [], datasets: [] },
+    options: { ...lineOpts, scales: { x: xAxis, y: { title: { display: true, text: 'Cumulative Avg Reward' } } } },
+  });
+  chartBar = new Chart(document.getElementById('chartBar'), {
+    type: 'bar', data: { labels: [], datasets: [] },
+    options: {
+      responsive: true, animation: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { title: { display: true, text: 'Cumulative Avg Reward' }, beginAtZero: true } },
+    },
+  });
+}
+
+function updateCharts() {
+  const nSteps = +document.getElementById('nSteps').value;
+  /* Downsample to at most 500 points for chart performance */
+  const step = Math.max(1, Math.floor(nSteps / 500));
+  const labels = [];
+  for (let t = 0; t < nSteps; t += step) labels.push(t);
+
+  function lineDatasets(key) {
+    return agents.filter(a => a.results).map(a => ({
+      label: agentLabel(a),
+      data: labels.map(t => a.results[key][t]),
+      borderColor: a.color,
+      backgroundColor: a.color + '20',
+      tension: 0.1,
+    }));
+  }
+
+  /* Best-possible dashed reference line */
+  const bestLine = (bestPossibleReward !== null) ? [{
+    label: 'Best possible (' + bestPossibleReward.toFixed(2) + ')',
+    data: labels.map(() => bestPossibleReward),
+    borderColor: '#999',
+    borderDash: [6, 4],
+    borderWidth: 1.5,
+    pointRadius: 0,
+    fill: false,
+    tension: 0,
+  }] : [];
+
+  chartReward.data     = { labels, datasets: [...lineDatasets('avgRewards'), ...bestLine] };
+  chartOptimal.data    = { labels, datasets: lineDatasets('avgOptimal') };
+  chartCumulative.data = { labels, datasets: [...lineDatasets('cumAvgRewards'), ...bestLine] };
+
+  const sorted = agents.filter(a => a.results).sort((a, b) => b.results.cumAvg - a.results.cumAvg);
+  chartBar.data = {
+    labels: sorted.map(agentLabel),
+    datasets: [{ data: sorted.map(a => +a.results.cumAvg.toFixed(3)), backgroundColor: sorted.map(a => a.color), borderRadius: 4 }],
+  };
+
+  chartReward.update();
+  chartOptimal.update();
+  chartCumulative.update();
+  chartBar.update();
+}
+
+/* ═══════════════════════════════════════
+   Initialise with default agents
+   ═══════════════════════════════════════ */
+initCharts();
+
+addAgent('greedy');
+const eps01 = addAgent('epsilon'); eps01.params.epsilon = 0.01; eps01.name = 'Epsilon-Greedy';
+addAgent('epsilon');   // eps = 0.1 default
+addAgent('optimistic');
+addAgent('ucb');
+
+renderAgents();
+</script>
+</body>
+</html>
