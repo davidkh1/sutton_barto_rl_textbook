@@ -3,16 +3,25 @@ Figure 2.1: An example bandit problem from the 10-armed testbed.
 
 Shows violin plots of reward distributions for each action,
 with true values q*(a) marked.
+
+From the RL book:
+"Figure 2.1: An example bandit problem from the 10-armed testbed. The true value q⇤(a) of
+each of the ten actions was selected according to a normal distribution with mean zero and unit
+variance, and then the actual rewards were selected according to a mean q⇤(a), unit-variance
+normal distribution, as suggested by these gray distributions."
 """
+
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 from multi_armed_testbed import MultiArmedTestbed
 
+OUTPUT_FILE = Path(__file__).parent / 'output' / 'figure_2_1.png'
+
 
 def plot_figure_2_1(testbed: MultiArmedTestbed, task: int = 0) -> None:
     fig, ax = plt.subplots(figsize=(10, 6))
-
     q_star = testbed.q_star[task]
 
     # Generate samples for violin plot
@@ -23,7 +32,7 @@ def plot_figure_2_1(testbed: MultiArmedTestbed, task: int = 0) -> None:
     parts = ax.violinplot(samples, positions=range(1, testbed.n_arms + 1),
                           showmeans=False, showmedians=False, showextrema=False)
 
-    for pc in parts['bodies']:
+    for pc in parts['bodies']:  # type: ignore[union-attr]
         pc.set_facecolor('gray')
         pc.set_alpha(0.7)
 
@@ -41,11 +50,12 @@ def plot_figure_2_1(testbed: MultiArmedTestbed, task: int = 0) -> None:
     ax.set_title('Figure 2.1: An example bandit problem from the 10-armed testbed')
 
     plt.tight_layout()
-    plt.savefig('figure_2_1.png', dpi=150)
+    OUTPUT_FILE.parent.mkdir(exist_ok=True)
+    plt.savefig(OUTPUT_FILE, dpi=150)
     plt.show()
 
 
 if __name__ == '__main__':
-    testbed = MultiArmedTestbed(n_arms=10, n_tasks=2000, seed=42)
-    plot_figure_2_1(testbed, task=0)
-    print("Saved figure_2_1.png")
+    tb = MultiArmedTestbed(n_arms=10, n_tasks=2000, seed=42)
+    plot_figure_2_1(tb, task=0)
+    print(f"Saved {OUTPUT_FILE}")
