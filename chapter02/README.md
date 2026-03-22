@@ -11,6 +11,10 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 - Best possible reward per step is ~1.54: [Monte Carlo estimate](best_reward_per_step.py) and
   [analytical derivation](best_reward_per_step_derivation.ipynb)
 
+## Exercises
+
+- Exercise 2.5: Nonstationary bandit problem — [code](exercise_2_5.py) and [graph](results/exercise_2_5.png)
+
 ## Interactive Simulation
 
 - [**Interactive Bandit Testbed**](https://davidkh1.github.io/deeprl_educational/sutton_barto_rl_textbook/chapter02/interactive_bandit_testbed/) 
