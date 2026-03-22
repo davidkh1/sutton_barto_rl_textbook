@@ -123,3 +123,71 @@ class MultiArmedTestbed:
             all_optimal[run] = optimal
 
         return all_rewards.mean(axis=0), all_optimal.mean(axis=0) * 100
+
+
+def run_vectorized(
+    q_star: np.ndarray,
+    n_steps: int,
+    epsilon: float,
+    alpha: float | None = None,
+    q_init: float = 0.0,
+    walk_std: float = 0.0,
+    seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Vectorized bandit simulation across all runs in parallel.
+
+    Args:
+        q_star: True action values, shape (n_runs, n_arms). Copied internally;
+                the original is not modified.
+        n_steps: Number of time steps per run.
+        epsilon: Exploration probability for epsilon-greedy.
+        alpha: Constant step-size. None for sample-average (1/n).
+        q_init: Initial Q estimate for all actions.
+        walk_std: Std of random walk added to q* each step (0 = stationary).
+        seed: RNG seed for action selection and rewards.
+
+    Returns:
+        avg_rewards: Average reward at each time step, shape (n_steps,).
+        pct_optimal: % optimal action at each time step, shape (n_steps,).
+    """
+    q_star = q_star.copy()
+    n_runs, n_arms = q_star.shape
+    rng = np.random.default_rng(seed)
+
+    q_estimates = np.full((n_runs, n_arms), q_init)
+    action_counts = np.zeros((n_runs, n_arms), dtype=int)
+    avg_rewards = np.zeros(n_steps)
+    pct_optimal = np.zeros(n_steps)
+    run_idx = np.arange(n_runs)
+
+    for t in range(n_steps):
+        # Epsilon-greedy action selection
+        explore = rng.random(n_runs) < epsilon
+        random_actions = rng.integers(n_arms, size=n_runs)
+        noisy_q = q_estimates + rng.random((n_runs, n_arms)) * 1e-10
+        greedy_actions = np.argmax(noisy_q, axis=1)
+        actions = np.where(explore, random_actions, greedy_actions)
+
+        # Get rewards: R ~ N(q*(action), 1)
+        rewards = rng.normal(q_star[run_idx, actions], 1.0)
+
+        # Update Q estimates
+        errors = rewards - q_estimates[run_idx, actions]
+        if alpha is None:
+            action_counts[run_idx, actions] += 1
+            step_sizes = 1.0 / action_counts[run_idx, actions]
+        else:
+            step_sizes = alpha
+        q_estimates[run_idx, actions] += step_sizes * errors
+
+        # Record results
+        avg_rewards[t] = rewards.mean()
+        optimal_actions = np.argmax(q_star, axis=1)
+        pct_optimal[t] = (actions == optimal_actions).mean() * 100
+
+        # Random walk (nonstationary)
+        if walk_std > 0:
+            q_star += rng.normal(0, walk_std, (n_runs, n_arms))
+
+    return avg_rewards, pct_optimal
