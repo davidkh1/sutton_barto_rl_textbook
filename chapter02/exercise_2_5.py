@@ -38,6 +38,7 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
+from multi_armed_testbed import run_vectorized
 
 OUTPUT_FILE = Path(__file__).parent / 'output' / 'exercise_2_5.png'
 
@@ -68,63 +69,17 @@ def run_nonstationary_experiment(
         'Constant α = 0.1': 0.1,      # step_size = 0.1
     }
 
-    n_arms, n_runs, n_steps = cfg.n_arms, cfg.n_runs, cfg.n_steps
-    epsilon, walk_std = cfg.epsilon, cfg.walk_std
+    # All q*(a) start at 0 (nonstationary: they drift via random walks)
+    q_star = np.zeros((cfg.n_runs, cfg.n_arms))
 
     results = {}
     for name, alpha in methods.items():
         print(f"Running {name}...")
-        rng = np.random.default_rng(cfg.seed)
-
-        # Vectorize across all runs: shape (n_runs, n_arms)
-        q_star = np.zeros((n_runs, n_arms))
-        q_estimates = np.zeros((n_runs, n_arms))
-        action_counts = np.zeros((n_runs, n_arms), dtype=int)
-
-        avg_rewards = np.zeros(n_steps)
-        avg_optimal = np.zeros(n_steps)
-
-        for t in range(n_steps):
-            # Epsilon-greedy action selection (vectorized across runs)
-            explore = rng.random(n_runs) < epsilon
-            random_actions = rng.integers(n_arms, size=n_runs)
-
-            # Greedy actions: argmax with random tiebreaking
-            # Add small noise to break ties randomly
-            noisy_q = q_estimates + rng.random((n_runs, n_arms)) * 1e-10
-            greedy_actions = np.argmax(noisy_q, axis=1)
-
-            actions = np.where(explore, random_actions, greedy_actions)
-
-            # Get rewards: R ~ N(q*(action), 1)
-            q_selected = q_star[np.arange(n_runs), actions]
-            rewards = rng.normal(q_selected, 1.0)
-
-            # Update Q estimates
-            action_mask = np.zeros((n_runs, n_arms), dtype=bool)
-            action_mask[np.arange(n_runs), actions] = True
-            action_counts += action_mask
-
-            errors = np.zeros((n_runs, n_arms))
-            errors[np.arange(n_runs), actions] = rewards - q_estimates[np.arange(n_runs), actions]
-
-            if alpha is None:
-                # Sample average: step_size = 1/n (avoid division by zero)
-                safe_counts = np.maximum(action_counts, 1)
-                step_sizes = np.where(action_counts > 0, 1.0 / safe_counts, 0.0)
-                q_estimates += step_sizes * errors
-            else:
-                q_estimates += alpha * errors
-
-            # Record results
-            avg_rewards[t] = rewards.mean()
-            optimal_actions = np.argmax(q_star, axis=1)
-            avg_optimal[t] = (actions == optimal_actions).mean() * 100
-
-            # Random walk: q*(a) += N(0, walk_std) for all actions and runs
-            q_star += rng.normal(0, walk_std, (n_runs, n_arms))
-
-        results[name] = (avg_rewards, avg_optimal)
+        avg_rewards, pct_optimal = run_vectorized(
+            q_star, cfg.n_steps, cfg.epsilon,
+            alpha=alpha, q_init=0.0, walk_std=cfg.walk_std, seed=cfg.seed,
+        )
+        results[name] = (avg_rewards, pct_optimal)
 
     return results
 
