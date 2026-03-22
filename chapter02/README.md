@@ -8,6 +8,7 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 - Core code: [multi_armed_testbed.py](multi_armed_testbed.py)
 - Figure 2.1: [code](figure_2_1.py) and [graph](results/figure_2_1.png)
 - Figure 2.2: [code](figure_2_2.py) and [graph](results/figure_2_2.png)
+- Figure 2.3: Optimistic initial values — [code](figure_2_3.py) and [graph](results/figure_2_3.png)
 - Best possible reward per step is ~1.54: [Monte Carlo estimate](best_reward_per_step.py) and
   [analytical derivation](best_reward_per_step_derivation.ipynb)
 
