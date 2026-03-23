@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from multi_armed_testbed import MultiArmedTestbed, run_vectorized
 
 OUTPUT_FILE = Path(__file__).parent / 'output' / 'figure_2_3.png'
+OUTPUT_FILE_ZOOMED = Path(__file__).parent / 'output' / 'figure_2_3_spikes.png'
 
 N_RUNS = 2000
 N_STEPS = 1000
@@ -89,8 +90,49 @@ def plot_figure_2_3(results: dict[str, np.ndarray]) -> None:
     plt.show()
 
 
+def plot_figure_2_3_spikes(results: dict[str, np.ndarray]) -> None:
+    """Zoomed-in plot of first 50 steps showing periodic spikes (Exercise 2.6)."""
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    # Only plot the optimistic method
+    for name, pct_optimal in results.items():
+        if 'Optimistic' in name:
+            data = pct_optimal[:50]
+            ax.plot(data, color='#4488cc', linewidth=1.5, marker='.', markersize=6)
+            break
+
+    # Mark the first spike at step 10 (after trying all 10 arms once).
+    # Later "rounds" are less sharp because runs desynchronize — different runs
+    # explore arms in different orders, so the spikes blur when averaged.
+    ax.axvline(x=10, color='red', linestyle=':', linewidth=1, alpha=0.7)
+    ax.text(10.5, 47, 'step 10:\nall arms tried once', fontsize=8, color='red')
+
+    # Find and mark local peaks around steps 20 and 30
+    for start, end in [(18, 26), (28, 40)]:
+        segment = data[start:end]
+        peak_idx = start + np.argmax(segment)
+        ax.annotate(f'step {peak_idx}', xy=(peak_idx, data[peak_idx]),
+                    xytext=(peak_idx + 2, data[peak_idx] + 5),
+                    fontsize=8, color='red',
+                    arrowprops=dict(arrowstyle='->', color='red', lw=1))
+
+    ax.set_xlabel('Steps')
+    ax.set_ylabel('% Optimal\naction', rotation=0, labelpad=40, va='center')
+    ax.set_xlim(0, 50)
+    ax.set_ylim(0, 50)
+    ax.grid(True, alpha=0.3)
+    ax.set_title('Exercise 2.6: Mysterious spikes in the optimistic method (first 50 steps)')
+
+    plt.tight_layout()
+    OUTPUT_FILE_ZOOMED.parent.mkdir(exist_ok=True)
+    plt.savefig(OUTPUT_FILE_ZOOMED, dpi=150)
+    plt.show()
+
+
 if __name__ == '__main__':
     print("Generating Figure 2.3...")
     experiment_results = run_figure_2_3()
     plot_figure_2_3(experiment_results)
     print(f"Saved {OUTPUT_FILE}")
+    plot_figure_2_3_spikes(experiment_results)
+    print(f"Saved {OUTPUT_FILE_ZOOMED}")
