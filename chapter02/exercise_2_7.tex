@@ -1,0 +1,109 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 2.7: Unbiased Constant-Step-Size Trick}
+\author{Sutton \& Barto, Section 2.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+In most of this chapter we have used sample averages to estimate action values because
+sample averages do not produce the initial bias that constant step sizes do.
+However, sample averages perform poorly on nonstationary problems.
+Is it possible to avoid the bias of constant step sizes while retaining their advantages
+on nonstationary problems? One way is to use a step size of
+\begin{equation}
+    \beta_n = \frac{\alpha}{\bar{o}_n} \tag{2.8}
+\end{equation}
+to process the $n$th reward for a particular action, where $\alpha > 0$ is a conventional
+constant step size, and $\bar{o}_n$ is a trace of one that starts at 0:
+\begin{equation}
+    \bar{o}_n = \bar{o}_{n-1} + \alpha(1 - \bar{o}_{n-1}), \quad
+    \text{for } n > 0, \quad \text{with } \bar{o}_0 = 0. \tag{2.9}
+\end{equation}
+Carry out an analysis like that in (2.6) to show that $Q_n$ is an exponential
+recency-weighted average \emph{without initial bias}.
+
+\section*{Solution}
+
+\subsection*{Step 1: Solve the recurrence for $\bar{o}_n$}
+
+Rewrite the recurrence as $\bar{o}_n = \alpha + (1-\alpha)\bar{o}_{n-1}$.
+Unrolling with $\bar{o}_0 = 0$:
+\begin{align*}
+    \bar{o}_1 &= \alpha \\
+    \bar{o}_2 &= \alpha + (1-\alpha)\alpha = \alpha\bigl[1 + (1-\alpha)\bigr] \\
+    \bar{o}_3 &= \alpha\bigl[1 + (1-\alpha) + (1-\alpha)^2\bigr]
+\end{align*}
+In general, this is a geometric series:
+\[
+    \boxed{\bar{o}_n = \alpha \sum_{i=0}^{n-1}(1-\alpha)^i = 1 - (1-\alpha)^n}
+\]
+Note that $\bar{o}_n \to 1$ as $n \to \infty$, and $\bar{o}_n < 1$ for all finite $n$.
+
+\subsection*{Step 2: Compute $\beta_n$}
+
+\[
+    \beta_n = \frac{\alpha}{\bar{o}_n} = \frac{\alpha}{1 - (1-\alpha)^n}
+\]
+
+\subsection*{Step 3: Expand $Q_{n+1}$ as a weighted sum}
+
+The update rule $Q_{n+1} = Q_n + \beta_n(R_n - Q_n) = (1 - \beta_n)Q_n + \beta_n R_n$
+expands recursively to:
+\[
+    Q_{n+1} = \underbrace{\prod_{j=1}^{n}(1-\beta_j)}_{w_0} \cdot Q_1
+    \;+\; \sum_{i=1}^{n} \underbrace{\beta_i \prod_{j=i+1}^{n}(1-\beta_j)}_{w_i} \cdot R_i
+\]
+
+\subsection*{Step 4: Show $w_0 = 0$ (no initial bias)}
+
+We need to evaluate $\prod_{j=1}^{n}(1-\beta_j)$. First, compute $1 - \beta_j$:
+\[
+    1 - \beta_j = 1 - \frac{\alpha}{\bar{o}_j} = \frac{\bar{o}_j - \alpha}{\bar{o}_j}
+\]
+From the recurrence, $\bar{o}_j = \alpha + (1-\alpha)\bar{o}_{j-1}$, so
+$\bar{o}_j - \alpha = (1-\alpha)\bar{o}_{j-1}$. Therefore:
+\[
+    1 - \beta_j = \frac{(1-\alpha)\,\bar{o}_{j-1}}{\bar{o}_j}
+\]
+The product \textbf{telescopes}:
+\[
+    \prod_{j=1}^{n}(1-\beta_j)
+    = \prod_{j=1}^{n} \frac{(1-\alpha)\,\bar{o}_{j-1}}{\bar{o}_j}
+    = (1-\alpha)^n \cdot \frac{\bar{o}_0}{\bar{o}_n}
+\]
+Since $\bar{o}_0 = 0$:
+\[
+    \boxed{w_0 = \prod_{j=1}^{n}(1-\beta_j) = 0}
+\]
+
+Therefore $Q_{n+1}$ depends only on $R_1, \ldots, R_n$ --- the initial estimate $Q_1$
+has \textbf{zero weight}. There is no initial bias.
+
+\subsection*{Step 5: Verify the weights sum to 1}
+
+Since $w_0 = 0$, the weights on $R_1, \ldots, R_n$ must sum to 1.
+This follows from the same argument as for constant $\alpha$ in equation~(2.6):
+the update rule preserves $\sum w_i = 1$, but now $w_0 = 0$ instead of $(1-\alpha)^n$.
+
+\subsection*{Summary}
+
+The trick works because:
+\begin{itemize}
+    \item $\bar{o}_n$ tracks a ``trace of one'' --- it starts at 0 and approaches 1,
+          measuring how much data has been seen.
+    \item $\beta_n = \alpha/\bar{o}_n$ is large early on (when $\bar{o}_n$ is small)
+          and approaches $\alpha$ as $n \to \infty$.
+    \item The telescoping product $\prod(1-\beta_j)$ contains $\bar{o}_0 = 0$ as a factor,
+          killing the dependence on $Q_1$ entirely.
+    \item In the long run, $\beta_n \approx \alpha$, so the method behaves like a constant
+          step-size method and tracks nonstationary environments --- but without the
+          initial bias.
+\end{itemize}
+
+\end{document}
