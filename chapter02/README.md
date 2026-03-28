@@ -14,8 +14,10 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 
 ## Exercises
 
+- Exercise 2.4: General weighting for non-constant step sizes — [derivation (LaTeX)](exercise_2_4.tex) and [PDF](output/exercise_2_4.pdf)
 - Exercise 2.5: Nonstationary bandit problem — [code](exercise_2_5.py) and [graph](results/exercise_2_5.png)
 - Exercise 2.6: [Mysterious Spikes](exercise_2_6.md) — why oscillations appear in Figure 2.3
+- Exercise 2.7: Unbiased constant-step-size trick — [derivation (LaTeX)](exercise_2_7.tex) and [PDF](output/exercise_2_7.pdf)
 
 ## Interactive Simulation
 
