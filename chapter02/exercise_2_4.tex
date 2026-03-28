@@ -1,0 +1,105 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 2.4: General Weighting for Non-Constant Step Sizes}
+\author{Sutton \& Barto, Section 2.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+If the step-size parameters, $\alpha_n$, are not constant, then the estimate $Q_n$ is a
+weighted average of previously received rewards with a weighting different from that
+given by (2.6). What is the weighting on each prior reward for the general case,
+analogous to (2.6), in terms of the sequence of step-size parameters?
+
+\section*{Background: Equation (2.6) for constant $\alpha$}
+
+With a constant step size $\alpha$, the textbook derives:
+\begin{equation}
+    Q_{n+1} = (1-\alpha)^n Q_1 + \sum_{i=1}^{n} \alpha(1-\alpha)^{n-i}\, R_i \tag{2.6}
+\end{equation}
+The weight on $Q_1$ is $(1-\alpha)^n$ and the weight on $R_i$ is $\alpha(1-\alpha)^{n-i}$.
+All weights sum to 1. We now generalize this to non-constant step sizes.
+
+\section*{Solution}
+
+\subsection*{Step 1: The update rule}
+
+With a possibly different step size $\alpha_n$ at each step:
+\[
+    Q_{n+1} = Q_n + \alpha_n\bigl[R_n - Q_n\bigr] = (1 - \alpha_n)\,Q_n + \alpha_n\, R_n
+\]
+
+\subsection*{Step 2: Recursive expansion}
+
+Expand by substituting $Q_n$, then $Q_{n-1}$, and so on:
+\begin{align*}
+    Q_{n+1} &= \alpha_n R_n + (1-\alpha_n)\,Q_n \\
+    &= \alpha_n R_n + (1-\alpha_n)\bigl[\alpha_{n-1} R_{n-1} + (1-\alpha_{n-1})\,Q_{n-1}\bigr] \\
+    &= \alpha_n R_n + (1-\alpha_n)\alpha_{n-1} R_{n-1}
+       + (1-\alpha_n)(1-\alpha_{n-1})\,Q_{n-1} \\
+    &\;\;\vdots
+\end{align*}
+Continuing until we reach $Q_1$:
+
+\[
+    \boxed{Q_{n+1} = \prod_{j=1}^{n}(1-\alpha_j)\cdot Q_1
+    \;+\; \sum_{i=1}^{n}\alpha_i \prod_{j=i+1}^{n}(1-\alpha_j)\cdot R_i}
+\]
+
+where the empty product $\prod_{j=n+1}^{n}(\cdot) = 1$ (i.e., $R_n$ has weight $\alpha_n$).
+
+\subsection*{Step 3: Identify the weights}
+
+Define:
+\begin{align*}
+    w_0 &= \prod_{j=1}^{n}(1-\alpha_j)
+    & &\text{(weight on initial estimate } Q_1\text{)} \\[6pt]
+    w_i &= \alpha_i \prod_{j=i+1}^{n}(1-\alpha_j), \quad i = 1, \ldots, n
+    & &\text{(weight on reward } R_i\text{)}
+\end{align*}
+
+So:
+\[
+    Q_{n+1} = w_0 \cdot Q_1 + \sum_{i=1}^{n} w_i \cdot R_i
+\]
+
+\subsection*{Step 4: Verify the weights sum to 1}
+
+We prove $w_0 + \sum_{i=1}^{n} w_i = 1$ by induction. For $n=1$:
+\[
+    w_0 + w_1 = (1-\alpha_1) + \alpha_1 = 1 \;\checkmark
+\]
+For the inductive step, assume the weights sum to 1 after $n-1$ rewards.
+The update $Q_{n+1} = (1-\alpha_n)Q_n + \alpha_n R_n$ multiplies all previous weights
+by $(1-\alpha_n)$ and adds a new weight $\alpha_n$. Their sum is
+$(1-\alpha_n)\cdot 1 + \alpha_n = 1$. $\square$
+
+\subsection*{Step 5: Interpretation}
+
+\begin{itemize}
+    \item The weight on $R_i$ is $\alpha_i$ (the step size when $R_i$ was received) multiplied by
+          all the ``retention factors'' $(1-\alpha_j)$ for every subsequent step $j > i$.
+          Each later update retains a fraction $(1-\alpha_j)$ of the old estimate and overwrites
+          a fraction $\alpha_j$ with the new reward.
+    \item More recent rewards have fewer retention factors in their product, so they
+          naturally receive more weight.
+    \item The initial estimate $Q_1$ has no $\alpha$ factor --- it only survives through
+          the retention factors. If all $\alpha_j > 0$, then $w_0 \to 0$ as $n \to \infty$
+          (the initial bias vanishes).
+\end{itemize}
+
+\subsection*{Step 6: Recovering equation (2.6) as a special case}
+
+When $\alpha_i = \alpha$ for all $i$:
+\begin{align*}
+    w_0 &= (1-\alpha)^n \\
+    w_i &= \alpha\,(1-\alpha)^{n-i}
+\end{align*}
+which is exactly equation (2.6) --- the exponential recency-weighted average.
+
+\end{document}
