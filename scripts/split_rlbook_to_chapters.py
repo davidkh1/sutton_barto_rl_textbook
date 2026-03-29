@@ -116,9 +116,9 @@ def get_chapter_boundaries(reader: PdfReader) -> list[tuple[int, str, int, int]]
             if isinstance(item, list):
                 extract_bookmarks(item)
             else:
-                title = item.title
+                bookmark_title = item.title
                 page_num = reader.get_destination_page_number(item)
-                all_bookmarks.append((title, page_num))
+                all_bookmarks.append((bookmark_title, page_num))
 
     extract_bookmarks(outline)
 
