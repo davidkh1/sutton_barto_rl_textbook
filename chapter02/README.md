@@ -21,6 +21,6 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 
 ## Interactive Simulation
 
-- [**Interactive Bandit Testbed**](https://davidkh1.github.io/deeprl_educational/sutton_barto_rl_textbook/chapter02/interactive_bandit_testbed/) 
+- [**Interactive Bandit Testbed**](https://davidkh1.github.io/sutton_barto_rl_textbook/chapter02/interactive_bandit_testbed/) 
 — browser-based simulation comparing various methods ([source](interactive_bandit_testbed/index.html)). 
 For information about supported mouse operations, see the help at the bottom of the demo page.
