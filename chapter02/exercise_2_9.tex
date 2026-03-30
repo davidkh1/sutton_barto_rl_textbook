@@ -1,0 +1,65 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 2.9: Soft-max Is the Sigmoid for Two Actions}
+\author{Sutton \& Barto, Section 2.8}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Show that in the case of two actions, the soft-max distribution is the same
+as that given by the logistic, or sigmoid, function often used in statistics
+and artificial neural networks.
+
+\section*{Solution}
+
+\subsection*{Setup}
+
+With $k = 2$ actions $a_1$ and $a_2$, the soft-max (equation 2.11) gives the probability of
+selecting action $a_1$:
+\[
+    \Pr\{A_t = a_1\} = \pi_t(a_1)
+    = \frac{e^{H_t(a_1)}}{e^{H_t(a_1)} + e^{H_t(a_2)}}
+\]
+
+\subsection*{Derivation}
+
+Divide numerator and denominator by $e^{H_t(a_1)}$:
+\[
+    \pi_t(a_1) = \frac{1}{1 + e^{H_t(a_2) - H_t(a_1)}}
+\]
+
+Let $x = H_t(a_1) - H_t(a_2)$ (the preference difference). Then:
+\[
+    \boxed{\pi_t(a_1) = \frac{1}{1 + e^{-x}} = \sigma(x)}
+\]
+
+This is exactly the \textbf{logistic sigmoid function} $\sigma(x)$.
+
+Similarly:
+\[
+    \pi_t(a_2) = \frac{e^{H_t(a_2)}}{e^{H_t(a_1)} + e^{H_t(a_2)}}
+    = \frac{1}{1 + e^{x}} = \sigma(-x) = 1 - \sigma(x)
+\]
+
+\subsection*{Interpretation}
+
+The soft-max distribution over two actions is fully determined by the
+\emph{difference} in preferences $x = H_t(a_1) - H_t(a_2)$, mapped through
+the sigmoid:
+\begin{itemize}
+    \item $x \gg 0$: action $a_1$ is strongly preferred, $\sigma(x) \to 1$
+    \item $x = 0$: no preference, $\sigma(0) = 0.5$ (equal probability)
+    \item $x \ll 0$: action $a_2$ is strongly preferred, $\sigma(x) \to 0$
+\end{itemize}
+
+This is why logistic regression (binary classification) and two-action
+soft-max are equivalent: both model a binary choice as a sigmoid of a
+linear score difference. The soft-max generalizes the sigmoid to $k > 2$
+choices.
+
+\end{document}
