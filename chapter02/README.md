@@ -11,6 +11,7 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 - Figure 2.3: Optimistic initial values — [code](figure_2_3.py) and [graph](results/figure_2_3.png)
 - Figure 2.4: UCB action selection — [code](figure_2_4.py) and [graph](results/figure_2_4.png)
 - Figure 2.5: Gradient bandit with/without baseline — [code](figure_2_5.py) and [graph](results/figure_2_5.png)
+- Figure 2.6: Parameter study of all algorithms — [code](figure_2_6.py) and [graph](results/figure_2_6.png)
 - Best possible reward per step is ~1.54: [Monte Carlo estimate](best_reward_per_step.py) and
   [analytical derivation](best_reward_per_step_derivation.ipynb)
 
