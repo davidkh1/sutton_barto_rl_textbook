@@ -24,6 +24,7 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 - Exercise 2.8: [UCB Spikes](exercise_2_8.md) — why the spike appears on step 11 in Figure 2.4
 - Exercise 2.9: Soft-max is the sigmoid for two actions — [derivation (LaTeX)](exercise_2_9.tex) and [PDF](results/exercise_2_9.pdf)
 - Exercise 2.10: [Associative Search](exercise_2_10.md) — contextual bandit with two cases
+- Exercise 2.11: Nonstationary parameter study — [code](exercise_2_11.py) and [graph](results/exercise_2_11.png)
 
 ## Interactive Simulation
 

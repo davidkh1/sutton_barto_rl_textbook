@@ -216,9 +216,10 @@ if __name__ == '__main__':
     # Optimistic greedy: Q_0 from 1/4 to 4, α=0.1
     print("Running optimistic greedy...")
     opt_results = []
+    alpha = 0.1
     for exp in range(-2, 3):
         q_init = 2.0 ** exp
-        reward = run_optimistic_greedy(q_star, N_STEPS, q_init, 0.1, sim_seed)
+        reward = run_optimistic_greedy(q_star, N_STEPS, q_init, alpha, sim_seed)
         opt_results.append((q_init, reward))
         print(f"  Q₀={q_init:.4f}: {reward:.3f}")
 
