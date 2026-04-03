@@ -1,0 +1,45 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.10: Proof of the Geometric Series Formula}
+\author{Sutton \& Barto, Section 3.3}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Prove the second equality in (3.10):
+\[
+    G_t = \sum_{k=0}^{\infty} \gamma^k = \frac{1}{1 - \gamma}
+\]
+
+\section*{Solution}
+
+Let $S = \sum_{k=0}^{\infty} \gamma^k = 1 + \gamma + \gamma^2 + \gamma^3 + \cdots$
+
+Multiply both sides by $\gamma$:
+\[
+    \gamma S = \gamma + \gamma^2 + \gamma^3 + \gamma^4 + \cdots
+\]
+
+Subtract:
+\[
+    S - \gamma S = (1 + \gamma + \gamma^2 + \cdots) - (\gamma + \gamma^2 + \gamma^3 + \cdots) = 1
+\]
+
+All terms cancel except the first:
+\[
+    S(1 - \gamma) = 1
+\]
+
+Therefore:
+\[
+    \boxed{S = \frac{1}{1 - \gamma}}
+\]
+
+This holds for $0 \le \gamma < 1$, which ensures the series converges.
+
+\end{document}
