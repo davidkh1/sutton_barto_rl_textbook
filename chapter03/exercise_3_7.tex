@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.7: Maze Robot Reward Design}
+\author{Sutton \& Barto, Section 3.2}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Imagine that you are designing a robot to run a maze. You decide to give it a
+reward of $+1$ for escaping from the maze and a reward of zero at all other times.
+The task seems to break down naturally into episodes---the successive runs through
+the maze---so you decide to treat it as an episodic task, where the goal is to
+maximize expected total reward~(3.7). After running the learning agent for a while,
+you find that it is showing no improvement in escaping from the maze. What is going
+wrong? Have you effectively communicated to the agent what you want it to achieve?
+
+\section*{Solution}
+
+\subsection*{What's going wrong}
+
+With undiscounted episodic returns (equation~3.7), the return from any trajectory
+that eventually reaches the exit is:
+\[
+    G = 0 + 0 + \cdots + 0 + 1 = 1
+\]
+regardless of how many steps it takes. A path that escapes in 10 steps has the
+same return as one that wanders for 10{,}000 steps. The agent has no incentive to
+escape \emph{quickly}---only to escape \emph{eventually}. Since even a random
+policy will eventually escape (assuming the maze is solvable), all policies look
+equally good.
+
+\subsection*{The core issue}
+
+The reward signal does not communicate \textbf{urgency}. The agent's goal is to
+maximize expected return, but every successful trajectory yields the same return
+of~$+1$. There is no gradient for the agent to follow toward faster escape.
+
+\subsection*{Fixes}
+
+Any of these would work:
+
+\begin{enumerate}
+    \item \textbf{Use discounting ($\gamma < 1$)}: The return becomes
+          $G = \gamma^{K-1}$, where $K$ is the number of steps to escape.
+          Faster escape $\to$ higher return.
+    \item \textbf{Give $-1$ reward every step} (instead of $+1$ at the end):
+          The return becomes $G = -K$, so the agent is directly penalized for
+          every extra step. This is what the textbook recommends for maze tasks.
+\end{enumerate}
+
+Either fix is sufficient. Note that combining $-1$ per step with discounting
+would also work, but discounting actually \emph{weakens} the penalty for long
+episodes: the return $G = -(1 + \gamma + \cdots + \gamma^{K-1}) = -(1-\gamma^K)/(1-\gamma)$
+is bounded by $-1/(1-\gamma)$, whereas the undiscounted $G = -K$ grows without bound.
+So for this episodic task, the simplest and most effective fix is option~2: reward
+$= -1$ per step, no discounting.
+
+All approaches communicate the same thing: \emph{get out as fast as possible}.
+The original $+1$-at-exit reward only says ``get out'' without the
+``as fast as possible'' part.
+
+\end{document}
