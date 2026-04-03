@@ -1,0 +1,40 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.9: Returns with an Infinite Reward Sequence}
+\author{Sutton \& Barto, Section 3.3}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Suppose $\gamma = 0.9$ and the reward sequence is $R_1 = 2$ followed by an
+infinite sequence of 7s. What are $G_1$ and $G_0$?
+
+\section*{Solution}
+
+\subsection*{$G_1$}
+
+From time $t = 1$, all future rewards are 7:
+\[
+    G_1 = R_2 + \gamma R_3 + \gamma^2 R_4 + \cdots
+    = 7 + 0.9 \cdot 7 + 0.9^2 \cdot 7 + \cdots
+    = 7 \sum_{k=0}^{\infty} \gamma^k
+    = \frac{7}{1 - \gamma}
+    = \frac{7}{1 - 0.9}
+    = \boxed{70}
+\]
+
+using equation~(3.10): $\sum_{k=0}^{\infty} \gamma^k = \frac{1}{1-\gamma}$.
+
+\subsection*{$G_0$}
+
+Using the recursive relation $G_0 = R_1 + \gamma\, G_1$:
+\[
+    G_0 = 2 + 0.9 \cdot 70 = 2 + 63 = \boxed{65}
+\]
+
+\end{document}
