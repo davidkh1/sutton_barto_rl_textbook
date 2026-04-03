@@ -1,0 +1,84 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.6: Pole-Balancing with Episodic Discounting}
+\author{Sutton \& Barto, Section 3.3}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Suppose you treated pole-balancing as an episodic task but also used
+discounting, with all rewards zero except for $-1$ upon failure.
+What then would the return be at each time? How does this return differ
+from that in the discounted, continuing formulation of this task?
+
+\section*{Background: Two formulations from Example 3.4}
+
+The textbook describes two ways to formulate pole-balancing:
+
+\begin{enumerate}
+    \item \textbf{Episodic, undiscounted}: reward $=+1$ every step the pole stays up.
+          Return $= K$ (the number of steps before failure).
+    \item \textbf{Continuing, discounted}: reward $= -1$ on failure, $0$ otherwise.
+          Return $= -\gamma^{K-1}$, where $K$ is the number of steps until failure.
+\end{enumerate}
+
+This exercise asks about a \emph{third} variant: episodic \emph{with} discounting.
+
+\section*{Solution}
+
+\subsection*{Setup}
+
+Suppose the episode lasts $K$ steps before failure at step $K$.
+The rewards are:
+\[
+    R_1 = R_2 = \cdots = R_{K-1} = 0, \quad R_K = -1
+\]
+The episode terminates after receiving $R_K$.
+
+\subsection*{Return at each time step}
+
+Using the discounted return (3.8), the return at time step $t$ is:
+\begin{align*}
+    G_t &= R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots + \gamma^{K-t-1} R_K \\
+        &= 0 + 0 + \cdots + \gamma^{K-t-1}(-1) \\
+        &= -\gamma^{K-t-1}
+\end{align*}
+
+for $t = 0, 1, \ldots, K-1$. At the terminal state ($t = K$), $G_K = 0$.
+
+\subsection*{Comparison with the continuing formulation}
+
+In the \textbf{continuing, discounted} formulation (option 2 from Example 3.4),
+there is no terminal state --- after failure the pole is reset and the agent
+continues. The return therefore includes penalties from \emph{all} future failures.
+If the agent balances for $K_1$ steps, fails, then balances for $K_2$ steps, fails,
+etc., the return from $t=0$ is:
+\[
+    G_0 = -\gamma^{K_1-1} - \gamma^{K_1 + K_2 - 1} - \gamma^{K_1 + K_2 + K_3 - 1} - \cdots
+\]
+
+In the \textbf{episodic} formulation, only the \emph{current} episode matters:
+\[
+    G_0 = -\gamma^{K-1}
+\]
+
+\subsection*{Key difference}
+
+\begin{itemize}
+    \item \textbf{Episodic}: $G_t = -\gamma^{K-t-1}$. The return depends only on
+          how many steps remain until the \emph{current} failure. Future episodes
+          don't affect the return.
+    \item \textbf{Continuing}: The return accumulates $-1$ penalties from
+          \emph{all} future failures. A policy that fails frequently will have
+          a much worse return because the penalties pile up.
+    \item Both formulations agree that balancing longer is better (larger $K$
+          makes $\gamma^{K-t-1}$ smaller, so $G_t$ is closer to 0). But the continuing
+          formulation also penalizes future failures, making it a stricter objective.
+\end{itemize}
+
+\end{document}
