@@ -1,0 +1,58 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.11: Expected Reward in Terms of $\pi$ and $p$}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+If the current state is $S_t$, and actions are selected according to a stochastic
+policy $\pi$, then what is the expectation of $R_{t+1}$ in terms of the policy
+function $\pi$ and the four-argument dynamics function $p$ (3.2)?
+
+\section*{Solution}
+
+The four-argument dynamics function is defined in equation~(3.2) as:
+\[
+    p(s', r \mid s, a) \doteq \Pr\{S_{t+1} = s', R_{t+1} = r \mid S_t = s, A_t = a\}
+\]
+
+To find $\mathbb{E}_\pi[R_{t+1} \mid S_t = s]$, we marginalize over actions
+(weighted by the policy), next states, and rewards:
+
+\begin{align*}
+    \mathbb{E}_\pi[R_{t+1} \mid S_t = s]
+    &= \sum_{a} \pi(a \mid s) \; \mathbb{E}[R_{t+1} \mid S_t = s, A_t = a] \\[8pt]
+    &= \sum_{a} \pi(a \mid s) \sum_{s'} \sum_{r} r \; p(s', r \mid s, a)
+\end{align*}
+
+where the sums range over all $a \in \mathcal{A}(s)$, $s' \in \mathcal{S}^+$,
+and $r \in \mathcal{R}$.
+
+\subsection*{Derivation}
+
+By the law of total expectation, conditioning on the action:
+\[
+    \mathbb{E}_\pi[R_{t+1} \mid S_t = s]
+    = \sum_{a} \pi(a \mid s) \; \mathbb{E}[R_{t+1} \mid S_t = s, A_t = a]
+\]
+
+The inner expectation is computed from the dynamics:
+\[
+    \mathbb{E}[R_{t+1} \mid S_t = s, A_t = a]
+    = \sum_{r} r \sum_{s'} p(s', r \mid s, a)
+    = \sum_{s'} \sum_{r} r \; p(s', r \mid s, a)
+\]
+
+Combining:
+\[
+    \boxed{\mathbb{E}_\pi[R_{t+1} \mid S_t = s]
+    = \sum_{a} \pi(a \mid s) \sum_{s'} \sum_{r} r \; p(s', r \mid s, a)}
+\]
+
+\end{document}
