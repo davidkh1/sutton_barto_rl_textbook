@@ -1,0 +1,44 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.8: Computing Returns}
+\author{Sutton \& Barto, Section 3.3}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Suppose $\gamma = 0.5$ and the following sequence of rewards is received:
+$R_1 = -1$, $R_2 = 2$, $R_3 = 6$, $R_4 = 3$, $R_5 = 2$, with $T = 5$.
+What are $G_0, G_1, \ldots, G_5$? Hint: Work backwards.
+
+\section*{Solution}
+
+Using the recursive relation (3.9): $G_t = R_{t+1} + \gamma\, G_{t+1}$,
+with $G_T = G_5 = 0$.
+
+Working backwards:
+
+\begin{align*}
+    G_5 &= 0 & &\text{(terminal)} \\[6pt]
+    G_4 &= R_5 + \gamma\, G_5 = 2 + 0.5 \cdot 0 &= \;&\mathbf{2} \\[4pt]
+    G_3 &= R_4 + \gamma\, G_4 = 3 + 0.5 \cdot 2 &= \;&\mathbf{4} \\[4pt]
+    G_2 &= R_3 + \gamma\, G_3 = 6 + 0.5 \cdot 4 &= \;&\mathbf{8} \\[4pt]
+    G_1 &= R_2 + \gamma\, G_2 = 2 + 0.5 \cdot 8 &= \;&\mathbf{6} \\[4pt]
+    G_0 &= R_1 + \gamma\, G_1 = -1 + 0.5 \cdot 6 &= \;&\mathbf{2}
+\end{align*}
+
+\subsection*{Verification}
+
+We can verify $G_0$ directly from the definition (3.8):
+\begin{align*}
+    G_0 &= R_1 + \gamma R_2 + \gamma^2 R_3 + \gamma^3 R_4 + \gamma^4 R_5 \\
+        &= (-1) + 0.5(2) + 0.25(6) + 0.125(3) + 0.0625(2) \\
+        &= -1 + 1 + 1.5 + 0.375 + 0.125 \\
+        &= 2 \;\checkmark
+\end{align*}
+
+\end{document}
