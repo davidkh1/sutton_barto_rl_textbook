@@ -1,0 +1,62 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.5: Modifying the Dynamics for Episodic Tasks}
+\author{Sutton \& Barto, Section 3.3}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+The equations in Section 3.1 are for the continuing case and need to be
+modified (very slightly) to apply to episodic tasks. Show that you know
+the modifications needed by giving the modified version of (3.3).
+
+\section*{Background}
+
+Equation (3.3) states that for all $s \in \mathcal{S}$ and $a \in \mathcal{A}(s)$:
+\begin{equation}
+    \sum_{s' \in \mathcal{S}} \sum_{r \in \mathcal{R}} p(s', r \mid s, a) = 1
+    \tag{3.3}
+\end{equation}
+This says that the dynamics function $p$ defines a valid probability
+distribution over next states and rewards, for each state--action pair.
+
+In the continuing case, $\mathcal{S}$ is the set of all states and
+$s'$ can be any state in $\mathcal{S}$.
+
+\section*{Solution}
+
+In episodic tasks, we distinguish between:
+\begin{itemize}
+    \item $\mathcal{S}$ --- the set of all \emph{nonterminal} states
+    \item $\mathcal{S}^+$ --- the set of all states including the
+          \emph{terminal state}: $\mathcal{S}^+ = \mathcal{S} \cup \{s_{\text{terminal}}\}$
+\end{itemize}
+
+From any nonterminal state, the agent can transition to either another
+nonterminal state or to the terminal state. Therefore, the sum over
+next states must range over $\mathcal{S}^+$ instead of $\mathcal{S}$:
+
+\[
+    \boxed{\sum_{s' \in \mathcal{S}^+} \sum_{r \in \mathcal{R}}
+    p(s', r \mid s, a) = 1, \quad
+    \text{for all } s \in \mathcal{S}, \; a \in \mathcal{A}(s)}
+\]
+
+\subsection*{What changes and what doesn't}
+
+\begin{itemize}
+    \item The sum over $s'$ now includes $\mathcal{S}^+$ (not $\mathcal{S}$),
+          because transitions to the terminal state are possible.
+    \item The condition $s \in \mathcal{S}$ (nonterminal) stays the same ---
+          there are no actions or transitions \emph{from} the terminal state,
+          so the dynamics need only be defined for nonterminal states.
+    \item The equation still sums to 1: probability is conserved. Some of
+          that probability mass may now go to the terminal state.
+\end{itemize}
+
+\end{document}
