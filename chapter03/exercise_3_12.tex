@@ -1,0 +1,36 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.12: $v_\pi$ in Terms of $q_\pi$ and $\pi$}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Give an equation for $v_\pi$ in terms of $q_\pi$ and $\pi$.
+
+\section*{Solution}
+
+The state-value function is the expected return starting from state $s$
+and following policy $\pi$. Since $\pi$ selects actions stochastically,
+we average $q_\pi$ over all actions weighted by the policy:
+
+\[
+    \boxed{v_\pi(s) = \sum_{a} \pi(a \mid s) \; q_\pi(s, a)}
+\]
+
+This follows directly from the definitions:
+\begin{align*}
+    v_\pi(s) &\doteq \mathbb{E}_\pi[G_t \mid S_t = s] \\
+             &= \sum_{a} \pi(a \mid s) \; \mathbb{E}_\pi[G_t \mid S_t = s, A_t = a] \\
+             &= \sum_{a} \pi(a \mid s) \; q_\pi(s, a)
+\end{align*}
+
+where the second step uses the law of total expectation, conditioning on
+the action taken.
+
+\end{document}
