@@ -12,3 +12,5 @@ Reproductions and solutions of examples and problems from Chapter 3 of
 - Exercise 3.9: Returns with infinite reward sequence — [derivation (LaTeX)](exercise_3_9.tex) and [PDF](results/exercise_3_9.pdf)
 - Exercise 3.10: Proof of geometric series formula — [derivation (LaTeX)](exercise_3_10.tex) and [PDF](results/exercise_3_10.pdf)
 - Exercise 3.11: Expected reward in terms of π and p — [derivation (LaTeX)](exercise_3_11.tex) and [PDF](results/exercise_3_11.pdf)
+- Exercise 3.12: v_π in terms of q_π and π — [derivation (LaTeX)](exercise_3_12.tex) and [PDF](results/exercise_3_12.pdf)
+- Exercise 3.13: q_π in terms of v_π and p — [derivation (LaTeX)](exercise_3_13.tex) and [PDF](results/exercise_3_13.pdf)

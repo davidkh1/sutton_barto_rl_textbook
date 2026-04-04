@@ -1,0 +1,50 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.13: $q_\pi$ in Terms of $v_\pi$ and $p$}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Give an equation for $q_\pi$ in terms of $v_\pi$ and the four-argument
+dynamics function $p$.
+
+\section*{Solution}
+
+The action-value $q_\pi(s,a)$ is the expected return after taking action $a$
+in state $s$ and then following $\pi$. After taking the action, the environment
+transitions to some next state $s'$ with reward $r$ according to $p(s',r \mid s,a)$.
+From $s'$ onward, the expected return is $v_\pi(s')$.
+
+Using $G_t = R_{t+1} + \gamma\, G_{t+1}$:
+
+\begin{align*}
+    q_\pi(s, a) &= \mathbb{E}_\pi[R_{t+1} + \gamma\, G_{t+1} \mid S_t = s, A_t = a] \\
+                &= \sum_{s'} \sum_{r} p(s', r \mid s, a) \left[ r + \gamma\, v_\pi(s') \right]
+\end{align*}
+
+Therefore:
+\[
+    \boxed{q_\pi(s, a) = \sum_{s'} \sum_{r} p(s', r \mid s, a) \left[ r + \gamma\, v_\pi(s') \right]}
+\]
+
+where $s' \in \mathcal{S}^+$ and $r \in \mathcal{R}$.
+
+\subsection*{Connection to the Bellman equation}
+
+Substituting the result from Exercise~3.12 ($v_\pi(s) = \sum_a \pi(a|s)\, q_\pi(s,a)$)
+into this equation, or vice versa, yields the Bellman equation~(3.14):
+\[
+    v_\pi(s) = \sum_{a} \pi(a \mid s) \sum_{s'} \sum_{r}
+    p(s', r \mid s, a) \left[ r + \gamma\, v_\pi(s') \right]
+\]
+
+Exercises 3.12 and 3.13 decompose the Bellman equation into its two constituent
+parts, corresponding to the two levels of the backup diagram (Figure~3.4).
+
+\end{document}
