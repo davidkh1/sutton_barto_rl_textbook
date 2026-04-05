@@ -1,0 +1,71 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.16: Adding a Constant to All Rewards (Episodic Tasks)}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+Now consider adding a constant $c$ to all the rewards in an episodic task,
+such as maze running. Would this have any effect, or would it leave the task
+unchanged as in the continuing task above? Why or why not? Give an example.
+
+\section*{Solution}
+
+\subsection*{Episodic return with shifted rewards}
+
+In an episodic task, the return from time $t$ is a \emph{finite} sum:
+\[
+    G_t = \sum_{k=0}^{T-t-1} \gamma^k R_{t+k+1}
+\]
+
+Adding $c$ to every reward:
+\begin{align*}
+    G'_t &= \sum_{k=0}^{T-t-1} \gamma^k (R_{t+k+1} + c)
+         = G_t + c \sum_{k=0}^{T-t-1} \gamma^k
+\end{align*}
+
+\subsection*{Why this changes the task}
+
+The added term $c \sum_{k=0}^{T-t-1} \gamma^k$ depends on $T - t$, the number
+of steps remaining in the episode. Unlike the continuing case (where $\sum \gamma^k
+= \frac{1}{1-\gamma}$ is a fixed constant), the episode length $T$ varies across
+episodes and depends on the policy. Therefore:
+
+\begin{itemize}
+    \item The shift is \textbf{not} the same for all states or all policies.
+    \item Adding $c$ \textbf{does} change the relative values of states and can
+          change which policy is optimal.
+\end{itemize}
+
+\subsection*{Example: Maze running}
+
+Consider a maze where rewards are $-1$ per step (encouraging the agent to
+escape quickly). Adding $c = +2$ to all rewards makes each step yield $+1$.
+
+\begin{itemize}
+    \item \textbf{Before} ($R = -1$ per step): The agent wants to reach the
+          exit as quickly as possible to minimize the total penalty.
+    \item \textbf{After} ($R = +1$ per step): The agent is now \emph{rewarded}
+          for each step. Longer episodes yield higher returns, so the agent is
+          incentivized to \emph{avoid} the exit and wander as long as possible.
+\end{itemize}
+
+The optimal policy is completely reversed. This shows that, unlike in continuing
+tasks, the absolute values of rewards (not just their relative differences)
+matter in episodic tasks.
+
+\subsection*{Why the continuing case was immune}
+
+In the continuing case, every policy generates an infinite stream of future
+rewards. The constant $c$ contributes $\frac{c}{1-\gamma}$ regardless of the
+policy, so it cancels out when comparing policies. In the episodic case,
+different policies produce episodes of different lengths, so the contribution
+of $c$ varies and does not cancel.
+
+\end{document}

@@ -15,3 +15,5 @@ Reproductions and solutions of examples and problems from Chapter 3 of
 - Exercise 3.12: v_π in terms of q_π and π — [derivation (LaTeX)](exercise_3_12.tex) and [PDF](results/exercise_3_12.pdf)
 - Exercise 3.13: q_π in terms of v_π and p — [derivation (LaTeX)](exercise_3_13.tex) and [PDF](results/exercise_3_13.pdf)
 - Exercise 3.14: Verifying the Bellman equation for the gridworld — [derivation (LaTeX)](exercise_3_14.tex) and [PDF](results/exercise_3_14.pdf)
+- Exercise 3.15: Adding a constant to rewards (continuing tasks) — [derivation (LaTeX)](exercise_3_15.tex) and [PDF](results/exercise_3_15.pdf)
+- Exercise 3.16: Adding a constant to rewards (episodic tasks) — [derivation (LaTeX)](exercise_3_16.tex) and [PDF](results/exercise_3_16.pdf)
