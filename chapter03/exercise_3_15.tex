@@ -1,0 +1,59 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.15: Adding a Constant to All Rewards (Continuing Tasks)}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+In the gridworld example, rewards are positive for goals, negative for running
+into the edge, and zero otherwise. Are the signs of these rewards important, or
+only the intervals between them? Prove, using~(3.8), that adding a constant $c$
+to all rewards adds a constant $v_c$ to the values of all states, and thus does
+not affect the relative values under any policy. What is $v_c$ in terms of $c$
+and $\gamma$?
+
+\section*{Solution}
+
+\subsection*{Proof}
+
+The discounted return (3.8) for a continuing task is:
+\[
+    G_t = \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+\]
+
+If we add a constant $c$ to every reward, letting $R'_{t+k+1} = R_{t+k+1} + c$:
+\begin{align*}
+    G'_t &= \sum_{k=0}^{\infty} \gamma^k R'_{t+k+1}
+         = \sum_{k=0}^{\infty} \gamma^k (R_{t+k+1} + c) \\[6pt]
+         &= \sum_{k=0}^{\infty} \gamma^k R_{t+k+1}
+          + c \sum_{k=0}^{\infty} \gamma^k \\[6pt]
+         &= G_t + \frac{c}{1 - \gamma}
+\end{align*}
+
+Taking the expectation under any policy $\pi$:
+\[
+    v'_\pi(s) = \mathbb{E}_\pi[G'_t \mid S_t = s]
+              = \mathbb{E}_\pi[G_t \mid S_t = s] + \frac{c}{1 - \gamma}
+              = v_\pi(s) + \frac{c}{1 - \gamma}
+\]
+
+Therefore:
+\[
+    \boxed{v_c = \frac{c}{1 - \gamma}}
+\]
+
+\subsection*{Interpretation}
+
+Since $v_c$ is the same constant for all states, the difference $v'_\pi(s) - v'_\pi(s')
+= v_\pi(s) - v_\pi(s')$ is unchanged. Only the intervals (differences) between
+reward values matter, not their absolute signs. Shifting all rewards by $c$ simply
+shifts the entire value function by $\frac{c}{1-\gamma}$ without affecting which
+states are better or worse.
+
+\end{document}
