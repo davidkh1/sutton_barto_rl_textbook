@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.14: Verifying the Bellman Equation for the Gridworld}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+The Bellman equation (3.14) must hold for each state for the value function
+$v_\pi$ shown in Figure~3.2 (right) of Example~3.5. Show numerically that
+this equation holds for the center state, valued at $+0.7$, with respect to
+its four neighboring states, valued at $+2.3$, $+0.4$, $-0.4$, and $+0.7$.
+
+\section*{Solution}
+
+\subsection*{Setup}
+
+The Bellman equation (3.14) is:
+\[
+    v_\pi(s) = \sum_{a} \pi(a \mid s) \sum_{s'} \sum_{r}
+    p(s', r \mid s, a) \left[ r + \gamma\, v_\pi(s') \right]
+\]
+
+For the equiprobable random policy, $\pi(a \mid s) = 0.25$ for each of the
+four actions. The center state is not a special state (not $A$ or $B$), so each
+action deterministically moves to the neighboring cell with reward $r = 0$.
+The discount factor is $\gamma = 0.9$.
+
+\subsection*{Neighboring values}
+
+\begin{itemize}
+    \item North: $v_\pi = +2.3$
+    \item South: $v_\pi = -0.4$
+    \item East: $v_\pi = +0.4$
+    \item West: $v_\pi = +0.7$
+\end{itemize}
+
+\subsection*{Verification}
+
+Since the transitions are deterministic and all rewards are 0:
+\begin{align*}
+    v_\pi(s) &= \sum_{a} \pi(a \mid s) \left[ r + \gamma\, v_\pi(s') \right] \\[6pt]
+             &= 0.25 \left[ 0 + 0.9 \cdot 2.3 \right]
+              + 0.25 \left[ 0 + 0.9 \cdot (-0.4) \right] \\
+             &\quad + 0.25 \left[ 0 + 0.9 \cdot 0.4 \right]
+              + 0.25 \left[ 0 + 0.9 \cdot 0.7 \right] \\[6pt]
+             &= 0.25 \left[ 2.07 + (-0.36) + 0.36 + 0.63 \right] \\[4pt]
+             &= 0.25 \times 2.7 \\[4pt]
+             &= 0.675 \\[4pt]
+             &\approx \boxed{0.7} \;\checkmark
+\end{align*}
+
+This confirms the Bellman equation holds (to one decimal place) for the center state.
+
+\end{document}

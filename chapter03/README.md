@@ -14,3 +14,4 @@ Reproductions and solutions of examples and problems from Chapter 3 of
 - Exercise 3.11: Expected reward in terms of π and p — [derivation (LaTeX)](exercise_3_11.tex) and [PDF](results/exercise_3_11.pdf)
 - Exercise 3.12: v_π in terms of q_π and π — [derivation (LaTeX)](exercise_3_12.tex) and [PDF](results/exercise_3_12.pdf)
 - Exercise 3.13: q_π in terms of v_π and p — [derivation (LaTeX)](exercise_3_13.tex) and [PDF](results/exercise_3_13.pdf)
+- Exercise 3.14: Verifying the Bellman equation for the gridworld — [derivation (LaTeX)](exercise_3_14.tex) and [PDF](results/exercise_3_14.pdf)
