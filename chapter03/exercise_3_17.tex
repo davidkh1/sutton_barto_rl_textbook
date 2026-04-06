@@ -1,0 +1,47 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.17: Bellman Equation for Action Values}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+What is the Bellman equation for action values, that is, for $q_\pi$? It must
+give the action value $q_\pi(s, a)$ in terms of the action values
+$q_\pi(s', a')$ of possible successors to the state--action pair $(s, a)$.
+Show the sequence of equations analogous to~(3.14), but for action values.
+
+\section*{Solution}
+
+Starting from the definition and using $G_t = R_{t+1} + \gamma\, G_{t+1}$:
+\begin{align*}
+    q_\pi(s, a)
+    &= \mathbb{E}_\pi[G_t \mid S_t = s, A_t = a] \\[6pt]
+    &= \mathbb{E}_\pi[R_{t+1} + \gamma\, G_{t+1} \mid S_t = s, A_t = a] \\[6pt]
+    &= \sum_{s'} \sum_{r} p(s', r \mid s, a)
+       \left[ r + \gamma\, \mathbb{E}_\pi[G_{t+1} \mid S_{t+1} = s'] \right] \\[6pt]
+    &= \sum_{s'} \sum_{r} p(s', r \mid s, a)
+       \left[ r + \gamma\, v_\pi(s') \right]
+\end{align*}
+
+Now substitute the result from Exercise~3.12, $v_\pi(s') = \sum_{a'} \pi(a' \mid s')\, q_\pi(s', a')$:
+
+\[
+    \boxed{q_\pi(s, a) = \sum_{s'} \sum_{r} p(s', r \mid s, a)
+    \left[ r + \gamma \sum_{a'} \pi(a' \mid s')\, q_\pi(s', a') \right]}
+\]
+
+This is the Bellman equation for $q_\pi$: the value of taking action $a$ in
+state $s$ equals the expected immediate reward plus the discounted value of
+the next state--action pair $(s', a')$, where $a'$ is chosen according to $\pi$.
+
+The corresponding backup diagram has a state--action node at the root,
+branches to possible next states $s'$ (weighted by $p$), and from each $s'$
+branches to possible next actions $a'$ (weighted by $\pi$).
+
+\end{document}
