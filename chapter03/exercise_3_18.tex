@@ -1,0 +1,42 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.18: $v_\pi(s)$ from the Backup Diagram}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+The value of a state depends on the values of the actions possible in that
+state and on how likely each action is to be taken under the current policy.
+The backup diagram is rooted at state $s$ and branches to possible actions.
+
+Give the equation for $v_\pi(s)$ in terms of $q_\pi(s, a)$, given $S_t = s$.
+First with an expectation conditioned on following $\pi$, then written out
+explicitly with no expected-value notation.
+
+\section*{Solution}
+
+\subsection*{With expectation notation}
+
+\[
+    v_\pi(s) = \mathbb{E}_\pi\!\left[\, q_\pi(s, A_t) \mid S_t = s \,\right]
+\]
+
+The expectation is over the action $A_t$ selected by $\pi$ in state $s$.
+
+\subsection*{Written out explicitly}
+
+\[
+    \boxed{v_\pi(s) = \sum_{a} \pi(a \mid s)\; q_\pi(s, a)}
+\]
+
+This corresponds to the upper half of the $v_\pi$ backup diagram (Figure~3.4,
+left): from the state node, we branch to each action $a$ with probability
+$\pi(a \mid s)$ and read off $q_\pi(s, a)$ at the leaves.
+
+\end{document}
