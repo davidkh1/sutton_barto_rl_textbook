@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Exercise 3.19: $q_\pi(s,a)$ from the Backup Diagram}
+\author{Sutton \& Barto, Section 3.5}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+
+The value of an action, $q_\pi(s, a)$, depends on the expected next reward and
+the expected sum of the remaining rewards. The backup diagram is rooted at a
+state--action pair $(s, a)$ and branches to possible next states.
+
+Give the equation for $q_\pi(s, a)$ in terms of $R_{t+1}$ and $v_\pi(S_{t+1})$,
+given $S_t = s$ and $A_t = a$. First with an expectation (not conditioned on
+following the policy), then written out explicitly using $p(s', r \mid s, a)$
+with no expected-value notation.
+
+\section*{Solution}
+
+\subsection*{With expectation notation}
+
+\[
+    q_\pi(s, a) = \mathbb{E}\!\left[\, R_{t+1} + \gamma\, v_\pi(S_{t+1})
+    \mid S_t = s,\, A_t = a \,\right]
+\]
+
+Note: the expectation is \emph{not} conditioned on following $\pi$. Once we
+condition on the action $a$, the next state and reward are determined entirely
+by the dynamics $p$, not by the policy.
+
+\subsection*{Written out explicitly}
+
+\[
+    \boxed{q_\pi(s, a) = \sum_{s'} \sum_{r} p(s', r \mid s, a)
+    \left[\, r + \gamma\, v_\pi(s') \,\right]}
+\]
+
+This corresponds to the lower half of the $v_\pi$ backup diagram (Figure~3.4,
+left): from the action node, we branch to each possible next state $s'$ and
+reward $r$ with probability $p(s', r \mid s, a)$, and read off $v_\pi(s')$
+at the leaves.
+
+\subsection*{Relationship to the full Bellman equation}
+
+Substituting the result of Exercise~3.18 into this equation (or vice versa)
+recovers the full Bellman equation~(3.14):
+\[
+    v_\pi(s) = \sum_{a} \pi(a \mid s) \sum_{s'} \sum_{r}
+    p(s', r \mid s, a) \left[\, r + \gamma\, v_\pi(s') \,\right]
+\]
+
+Similarly, substituting this equation into the result of Exercise~3.17 gives
+the Bellman equation for $q_\pi$ purely in terms of itself.
+
+\end{document}

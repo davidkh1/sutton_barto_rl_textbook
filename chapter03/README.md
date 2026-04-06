@@ -17,3 +17,6 @@ Reproductions and solutions of examples and problems from Chapter 3 of
 - Exercise 3.14: Verifying the Bellman equation for the gridworld — [derivation (LaTeX)](exercise_3_14.tex) and [PDF](results/exercise_3_14.pdf)
 - Exercise 3.15: Adding a constant to rewards (continuing tasks) — [derivation (LaTeX)](exercise_3_15.tex) and [PDF](results/exercise_3_15.pdf)
 - Exercise 3.16: Adding a constant to rewards (episodic tasks) — [derivation (LaTeX)](exercise_3_16.tex) and [PDF](results/exercise_3_16.pdf)
+- Exercise 3.17: Bellman equation for action values — [derivation (LaTeX)](exercise_3_17.tex) and [PDF](results/exercise_3_17.pdf)
+- Exercise 3.18: v_π from the backup diagram — [derivation (LaTeX)](exercise_3_18.tex) and [PDF](results/exercise_3_18.pdf)
+- Exercise 3.19: q_π from the backup diagram — [derivation (LaTeX)](exercise_3_19.tex) and [PDF](results/exercise_3_19.pdf)
