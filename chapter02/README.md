@@ -1,4 +1,4 @@
-# Chapter 2
+# Chapter 2 — Multi-armed Bandits
 
 Reproductions and solutions of examples and problems from Chapter 2 of
 [Reinforcement Learning: An Introduction, 2nd edition](http://incompleteideas.net/book/the-book-2nd.html).
