@@ -36,6 +36,19 @@ Options:
 - `--chapters 2,3,4` - extract specific chapters only
 - `--force-download` - re-download PDF even if cached
 
+### 3. Compile LaTeX exercises
+
+Exercise derivations live in `chapterXX/latex/` and compile to `chapterXX/output/`:
+
+```bash
+cd chapter03/latex
+make                        # PDFs go to ../output/
+# or alternatively control the output directory
+make BUILDDIR=../results    # PDFs go to ../results/
+```
+
+Requires `pdflatex` (included with TeX Live or MacTeX).
+
 ## Chapters
 
 - [Chapter 1 — Introduction](chapter01/README.md)
