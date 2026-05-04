@@ -1,7 +1,7 @@
 # Chapter 2 — Multi-armed Bandits
 
 Reproductions and solutions of examples and problems from Chapter 2 of
-[Reinforcement Learning: An Introduction, 2nd edition](http://incompleteideas.net/book/the-book-2nd.html).
+[RL: An Introduction, 2e](http://incompleteideas.net/book/the-book-2nd.html).
 
 ## The 10-Armed Testbed
 
@@ -17,12 +17,12 @@ Reproductions and solutions of examples and problems from Chapter 2 of
 
 ## Exercises
 
-- Exercise 2.4: General weighting for non-constant step sizes — [derivation (LaTeX)](exercise_2_4.tex) and [PDF](results/exercise_2_4.pdf)
+- Exercise 2.4: General weighting for non-constant step sizes — [derivation (LaTeX)](latex/exercise_2_4.tex) and [PDF](results/exercise_2_4.pdf)
 - Exercise 2.5: Nonstationary bandit problem — [code](exercise_2_5.py) and [graph](results/exercise_2_5.png)
 - Exercise 2.6: [Mysterious Spikes](exercise_2_6.md) — why oscillations appear in Figure 2.3
-- Exercise 2.7: Unbiased constant-step-size trick — [derivation (LaTeX)](exercise_2_7.tex) and [PDF](results/exercise_2_7.pdf)
+- Exercise 2.7: Unbiased constant-step-size trick — [derivation (LaTeX)](latex/exercise_2_7.tex) and [PDF](results/exercise_2_7.pdf)
 - Exercise 2.8: [UCB Spikes](exercise_2_8.md) — why the spike appears on step 11 in Figure 2.4
-- Exercise 2.9: Soft-max is the sigmoid for two actions — [derivation (LaTeX)](exercise_2_9.tex) and [PDF](results/exercise_2_9.pdf)
+- Exercise 2.9: Soft-max is the sigmoid for two actions — [derivation (LaTeX)](latex/exercise_2_9.tex) and [PDF](results/exercise_2_9.pdf)
 - Exercise 2.10: [Associative Search](exercise_2_10.md) — contextual bandit with two cases
 - Exercise 2.11: Nonstationary parameter study — [code](exercise_2_11.py) and [graph](results/exercise_2_11.png)
 

@@ -1,7 +1,7 @@
 # "Reinforcement Learning: An Introduction" book
 
 I created this file while studying
-[Reinforcement Learning: An Introduction](http://incompleteideas.net/book/the-book-2nd.html) by Sutton & Barto (2nd edition).
+[RL: An Introduction, 2e](http://incompleteideas.net/book/the-book-2nd.html) by Sutton & Barto.
 
 I believe that the Deep Reinforcement Learning is the foundation of the forthcoming
 intelligent robotics revolution. I decided to fill in the gaps in my knowledge of the theory.
