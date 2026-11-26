@@ -7,6 +7,5 @@ __pycache__/
 # IDE
 .idea/
 
-# Local book PDFs (downloaded/generated)
+# Local copy of the full book PDF (downloaded)
 textbook_chapters/RLbook*.pdf
-chapter*/**/ch[0-9][0-9]_*.pdf
